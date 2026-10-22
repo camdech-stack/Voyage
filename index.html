@@ -105,7 +105,6 @@ main.wrap{padding-top:34px;padding-bottom:90px}
 .tag.aller,.tag.retour,.tag.autre{background:#d9ecf5;color:var(--forest-d)}
 .tag.todo{background:#fde0d4;color:var(--lava-d)}
 .tag.done{background:#dcefe3;color:#1d4a37}
-.price{font-weight:700}
 .pax{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 
 /* programme */
@@ -180,11 +179,6 @@ fieldset{border:0;margin:0 0 12px;padding:0}
 .inline input{flex:1;min-width:140px}
 .log{list-style:none;margin:0;padding:0;font-size:.9rem}
 .log li{padding:6px 0;border-top:1px solid var(--mist)}
-table.bal{width:100%;border-collapse:collapse;font-size:.95rem}
-table.bal th,table.bal td{padding:8px 4px;border-top:1px solid var(--mist);text-align:right}
-table.bal th:first-child,table.bal td:first-child{text-align:left}
-table.bal thead th{border-top:0;font-size:.78rem;color:var(--basalt-2);text-transform:uppercase;letter-spacing:.06em}
-.pos{color:var(--forest-d);font-weight:700}.neg{color:var(--lava-d);font-weight:700}
 
 /* porte d'entrée */
 #gate{min-height:100dvh;background:linear-gradient(180deg,#0b2236 0%,#14466a 55%,#2b8fb8 100%);color:var(--cream);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;padding:24px 0 120px}
@@ -283,7 +277,6 @@ table.bal thead th{border-top:0;font-size:.78rem;color:var(--basalt-2);text-tran
       <button role="tab" id="t-vols" data-tab="vols" aria-controls="p-vols" type="button">Vols</button>
       <button role="tab" id="t-log" data-tab="log" aria-controls="p-log" type="button">Logement</button>
       <button role="tab" id="t-act" data-tab="act" aria-controls="p-act" type="button">Activités</button>
-      <button role="tab" id="t-bud" data-tab="bud" aria-controls="p-bud" type="button">Budget</button>
       <button role="tab" id="t-set" data-tab="set" aria-controls="p-set" type="button" class="gear" aria-label="Réglages"><span aria-hidden="true">⚙</span></button>
     </div>
   </nav>
@@ -294,7 +287,6 @@ table.bal thead th{border-top:0;font-size:.78rem;color:var(--basalt-2);text-tran
     <section role="tabpanel" id="p-vols" aria-labelledby="t-vols" tabindex="0" hidden></section>
     <section role="tabpanel" id="p-log" aria-labelledby="t-log" tabindex="0" hidden></section>
     <section role="tabpanel" id="p-act" aria-labelledby="t-act" tabindex="0" hidden></section>
-    <section role="tabpanel" id="p-bud" aria-labelledby="t-bud" tabindex="0" hidden></section>
     <section role="tabpanel" id="p-set" aria-labelledby="t-set" tabindex="0" hidden></section>
   </main>
 </div>
@@ -339,7 +331,6 @@ const fTime = s => /T\d{2}:\d{2}/.test(s || '') ? s.slice(11, 16) : '';
 const fDT = s => s ? (fShort(s) + (fTime(s) ? ' · ' + fTime(s) : '')) : '';
 const dayDiff = (a, b) => Math.round((toD(b) - toD(a)) / 864e5);
 const addDays = (s, n) => new Date(toD(s).getTime() + n * 864e5).toISOString().slice(0, 10);
-const eur = n => new Intl.NumberFormat('fr-FR', {style:'currency', currency:'EUR'}).format(n);
 const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 function rangeDays(a, b) {
   const out = []; if (!isDay(a) || !isDay(b) || dayDiff(a, b) < 0 || dayDiff(a, b) > 400) return out;
@@ -376,7 +367,7 @@ async function unseal(env, code) {
 const COLORS = ['#2F6B4F', '#1FA3A6', '#E4572E', '#8A5A44', '#5B6C8F', '#B8860B', '#7A4E8C', '#4F7A2F'];
 function seedData() {
   const names = ['Camille', 'Nicolas', 'Bénédicte', 'Eugénie', 'Joséphine', 'Domitille'];
-  const A = (title, place, booking, notes) => ({id:uid(), title, day:'', time:'', place, booking, price:'', paidBy:'', url:'', notes, priv:''});
+  const A = (title, place, booking, notes) => ({id:uid(), title, day:'', time:'', place, booking, url:'', notes, priv:''});
   return {
     v:1,
     trip:{dest:'La Réunion', start:'2026-12-23', end:'2027-01-03', from:'Paris', to:'Saint-Denis (RUN)'},
@@ -701,7 +692,6 @@ function render() {
   $('#p-vols').innerHTML = rFlights(d);
   $('#p-log').innerHTML = rStays(d);
   $('#p-act').innerHTML = rActs(d);
-  $('#p-bud').innerHTML = rBudget(d);
   const sp = $('#p-set');
   if (!(sp.contains(document.activeElement) && document.activeElement.matches('input,textarea,select'))) sp.innerHTML = rSettings(d);
   showTab(S.tab, false);
@@ -732,7 +722,6 @@ function links(x, place) {
 function foot(coll, x, place) {
   return `<div class="card-foot">${links(x, place)}<span class="sp"></span>${canEdit() ? `<button class="link" type="button" data-act="edit" data-coll="${coll}" data-id="${esc(x.id)}">Modifier</button>` : ''}</div>`;
 }
-function money(d, x) { return x.price !== '' && x.price != null && +x.price > 0 ? `<div class="meta"><span class="price">${eur(+x.price)}</span>${x.paidBy ? ` · payé par ${esc(pname(d, x.paidBy))}` : ''}</div>` : ''; }
 function extra(x) { return (x.notes ? `<p class="notes">${esc(x.notes)}</p>` : '') + (x.priv ? `<div class="priv"><b>Infos privées</b>${esc(x.priv)}</div>` : ''); }
 
 /* ---- Programme ---- */
@@ -826,7 +815,7 @@ function rFlights(d) {
         <div class="meta"><b>${esc(f.from || '?')}</b> · ${esc(fDT(f.dep) || 'date à définir')}</div>
         <div class="meta"><b>${esc(f.to || '?')}</b> · ${esc(fDT(f.arr) || 'date à définir')}</div>
         ${f.pax.length ? `<div class="pax">${f.pax.map(id => { const p = d.people.find(x => x.id === id); return p ? `<span class="tag">${esc(p.name)}</span>` : ''; }).join('')}</div>` : ''}
-        ${money(d, f)}${extra(f)}</div>${foot('flights', f)}</article>`).join('') + '</div>'
+        ${extra(f)}</div>${foot('flights', f)}</article>`).join('') + '</div>'
       : '<div class="empty">Aucun vol pour l’instant.</div>');
 }
 
@@ -836,13 +825,12 @@ function rStays(d) {
   const list = d.stays.slice().sort((a, b) => (a.arrive || '9').localeCompare(b.arrive || '9')), edit = canEdit();
   return `<div class="section-h"><h2>Logement</h2>${edit ? '<button class="btn small" type="button" data-act="add" data-coll="stays">+ Logement</button>' : ''}</div>`
     + (list.length ? '<div class="grid">' + list.map(s => {
-      const n = nightsOf(s), per = (+s.price > 0 && d.people.length) ? +s.price / d.people.length : 0;
+      const n = nightsOf(s);
       return `<article class="card"><div class="card-body">
         <h3>${esc(s.name || 'Logement')}</h3>
         ${s.address ? `<div class="meta">${esc(s.address)}</div>` : ''}
         <div class="meta">Arrivée : ${esc(fDT(s.arrive) || '—')}</div><div class="meta">Départ : ${esc(fDT(s.depart) || '—')}</div>
         ${n != null ? `<div class="meta">${n} nuit${n > 1 ? 's' : ''}</div>` : ''}
-        ${+s.price > 0 ? `<div class="meta"><span class="price">${eur(+s.price)}</span>${per ? ` · ${eur(per)} par personne` : ''}${s.paidBy ? ` · payé par ${esc(pname(d, s.paidBy))}` : ''}</div>` : ''}
         ${extra(s)}</div>${foot('stays', s, s.address)}</article>`;
     }).join('') + '</div>' : '<div class="empty">Aucun logement pour l’instant.</div>');
 }
@@ -853,7 +841,7 @@ function actCard(d, a) {
     ${a.booking === 'todo' ? '<span class="tag todo">À réserver</span>' : a.booking === 'done' ? '<span class="tag done">Réservé</span>' : ''}
     <h3>${esc(a.title)}</h3>
     <div class="meta">${esc([a.time, a.place].filter(Boolean).join(' · '))}</div>
-    ${money(d, a)}${extra(a)}</div>${foot('acts', a, a.place)}</article>`;
+    ${extra(a)}</div>${foot('acts', a, a.place)}</article>`;
 }
 function rActs(d) {
   const trip = rangeDays(d.trip.start, d.trip.end), edit = canEdit();
@@ -866,43 +854,6 @@ function rActs(d) {
   const ideas = d.acts.filter(a => !a.day);
   h += '<h3 style="margin:20px 0 8px">Idées sans date</h3>' + (ideas.length ? '<div class="grid">' + ideas.map(a => actCard(d, a)).join('') + '</div>' : '<div class="empty">Aucune idée sans date.</div>');
   return h;
-}
-
-/* ---- Budget ---- */
-function budget(d) {
-  const ids = d.people.map(p => p.id), paid = {}, owed = {};
-  ids.forEach(i => { paid[i] = 0; owed[i] = 0; });
-  const items = [].concat(
-    d.flights.map(x => ({x, who:x.pax && x.pax.length ? x.pax : ids, label:[x.airline, x.number].filter(Boolean).join(' ') || 'Vol'})),
-    d.stays.map(x => ({x, who:ids, label:x.name || 'Logement'})),
-    d.acts.map(x => ({x, who:ids, label:x.title})));
-  let total = 0; const unpaid = [];
-  items.forEach(({x, who, label}) => {
-    const c = Math.round((+x.price || 0) * 100); if (!c) return;
-    if (!(x.paidBy in paid)) { unpaid.push(label); return; }
-    total += c; paid[x.paidBy] += c;
-    const part = who.filter(i => i in owed), p = part.length ? part : ids, base = Math.floor(c / p.length), rem = c - base * p.length;
-    p.forEach((i, k) => { owed[i] += base + (k < rem ? 1 : 0); });
-  });
-  const bal = {}; ids.forEach(i => bal[i] = paid[i] - owed[i]);
-  const cr = ids.filter(i => bal[i] > 0).map(i => [i, bal[i]]).sort((a, b) => b[1] - a[1]);
-  const de = ids.filter(i => bal[i] < 0).map(i => [i, -bal[i]]).sort((a, b) => b[1] - a[1]);
-  const pay = [];
-  while (cr.length && de.length) {
-    const m = Math.min(cr[0][1], de[0][1]); pay.push({from:de[0][0], to:cr[0][0], c:m});
-    cr[0][1] -= m; de[0][1] -= m; if (!cr[0][1]) cr.shift(); if (!de[0][1]) de.shift();
-  }
-  return {paid, owed, bal, pay, total, unpaid};
-}
-function rBudget(d) {
-  const b = budget(d), E = c => eur(c / 100);
-  if (!b.total && !b.unpaid.length) return '<div class="section-h"><h2>Budget</h2></div><div class="empty">Ajoute un prix et « payé par » à un vol, un logement ou une activité : les comptes se font tout seuls.</div>';
-  return `<div class="section-h"><h2>Budget</h2><span class="muted">Total : <b>${E(b.total)}</b></span></div>
-    <div class="set-block"><table class="bal"><thead><tr><th>Qui</th><th>A payé</th><th>Doit</th><th>Solde</th></tr></thead><tbody>
-    ${d.people.map(p => `<tr><td>${esc(p.name)}</td><td>${E(b.paid[p.id])}</td><td>${E(b.owed[p.id])}</td><td class="${b.bal[p.id] > 0 ? 'pos' : b.bal[p.id] < 0 ? 'neg' : ''}">${b.bal[p.id] > 0 ? '+' : ''}${E(b.bal[p.id])}</td></tr>`).join('')}
-    </tbody></table></div>
-    <div class="set-block"><h3>Remboursements</h3>${b.pay.length ? `<ul class="log">${b.pay.map(x => `<li><b>${esc(pname(d, x.from))}</b> doit <b>${E(x.c)}</b> à <b>${esc(pname(d, x.to))}</b></li>`).join('')}</ul>` : '<p class="muted" style="margin:0">Tout le monde est à l’équilibre.</p>'}</div>
-    <p class="muted">Les vols sont partagés entre les passagers cochés, le reste entre tous les voyageurs.${b.unpaid.length ? ` Sans « payé par » (non comptés) : ${esc(b.unpaid.join(', '))}.` : ''}</p>`;
 }
 
 /* ---- Réglages ---- */
@@ -952,7 +903,7 @@ function rSettings(d) {
 }
 
 /* ============ onglets ============ */
-const TABS = ['prog', 'vols', 'log', 'act', 'bud', 'set'];
+const TABS = ['prog', 'vols', 'log', 'act', 'set'];
 function showTab(name, focus) {
   if (!TABS.includes(name)) name = 'prog';
   S.tab = name; try { sessionStorage.setItem('trip:tab', name); } catch (e) {}
@@ -985,25 +936,21 @@ const FIELDS = {
     {n:'from', l:'Départ de'}, {n:'dep', l:'Départ (date et heure)', t:'datetime-local'},
     {n:'to', l:'Arrivée à'}, {n:'arr', l:'Arrivée (date et heure)', t:'datetime-local'},
     {n:'pax', l:'Passagers', t:'pax'},
-    {n:'price', l:'Prix total (€)', t:'number'}, {n:'paidBy', l:'Payé par', t:'payer'},
     {n:'url', l:'Lien', t:'url'}, {n:'notes', l:'Notes', t:'textarea'}, {n:'priv', l:'Infos privées (réf. de réservation…)', t:'textarea'}],
   stays:[
     {n:'name', l:'Nom', req:1}, {n:'address', l:'Adresse (lien Google Maps automatique)'},
     {n:'arrive', l:'Arrivée (date et heure)', t:'datetime-local'}, {n:'depart', l:'Départ (date et heure)', t:'datetime-local'},
-    {n:'price', l:'Prix total (€)', t:'number'}, {n:'paidBy', l:'Payé par', t:'payer'},
     {n:'url', l:'Lien de l’annonce', t:'url'}, {n:'notes', l:'Notes', t:'textarea'}, {n:'priv', l:'Infos privées (code de la porte, wifi…)', t:'textarea'}],
   acts:[
     {n:'title', l:'Titre', req:1}, {n:'day', l:'Jour (vide = idée sans date)', t:'date'}, {n:'time', l:'Heure', t:'time'},
     {n:'place', l:'Lieu (lien Google Maps automatique)'},
     {n:'booking', l:'Réservation', t:'select', o:[['none', 'Pas besoin'], ['todo', 'À réserver'], ['done', 'Réservé']]},
-    {n:'price', l:'Prix total (€)', t:'number'}, {n:'paidBy', l:'Payé par', t:'payer'},
     {n:'url', l:'Lien', t:'url'}, {n:'notes', l:'Notes', t:'textarea'}, {n:'priv', l:'Infos privées (réf., codes…)', t:'textarea'}]
 };
 const NOUN = {flights:'vol', stays:'logement', acts:'activité'};
 function fieldHtml(f, v, d) {
   const id = 'f-' + f.n, val = v == null ? '' : v;
   if (f.t === 'select') return `<label class="fld"><span>${f.l}</span><select id="${id}" name="${f.n}">${f.o.map(([k, l]) => `<option value="${k}" ${val === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`;
-  if (f.t === 'payer') return `<label class="fld"><span>${f.l}</span><select id="${id}" name="${f.n}"><option value="">—</option>${d.people.map(p => `<option value="${esc(p.id)}" ${val === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>`;
   if (f.t === 'pax') return `<fieldset><legend>${f.l}</legend><div class="checks">${d.people.map(p => `<label><input type="checkbox" name="pax" value="${esc(p.id)}" ${(val || []).includes(p.id) ? 'checked' : ''}>${esc(p.name)}</label>`).join('')}</div></fieldset>`;
   if (f.t === 'textarea') return `<label class="fld"><span>${f.l}</span><textarea id="${id}" name="${f.n}">${esc(val)}</textarea></label>`;
   const type = f.t || 'text', extra = type === 'number' ? ' step="0.01" min="0" inputmode="decimal"' : '';
@@ -1098,9 +1045,9 @@ document.addEventListener('click', e => {
     case 'retry': S.err = null; render(); S.queue.length ? flush() : pull(); break;
     case 'add': {
       const t = d.trip, k = b.dataset.kind, c = b.dataset.coll;
-      if (c === 'flights') openForm(c, null, {kind:k, from:k === 'retour' ? t.to : t.from, to:k === 'retour' ? t.from : t.to, dep:(k === 'retour' ? t.end : t.start) + 'T10:00', arr:'', pax:d.people.map(p => p.id), price:'', paidBy:'', url:'', notes:'', priv:''});
-      else if (c === 'stays') openForm(c, null, {arrive:t.start + 'T15:00', depart:t.end + 'T10:00', price:'', paidBy:''});
-      else openForm(c, null, {day:b.dataset.day || '', booking:'none', price:'', paidBy:''});
+      if (c === 'flights') openForm(c, null, {kind:k, from:k === 'retour' ? t.to : t.from, to:k === 'retour' ? t.from : t.to, dep:(k === 'retour' ? t.end : t.start) + 'T10:00', arr:'', pax:d.people.map(p => p.id), url:'', notes:'', priv:''});
+      else if (c === 'stays') openForm(c, null, {arrive:t.start + 'T15:00', depart:t.end + 'T10:00'});
+      else openForm(c, null, {day:b.dataset.day || '', booking:'none'});
       break;
     }
     case 'edit': openForm(b.dataset.coll, b.dataset.id); break;
@@ -1130,8 +1077,7 @@ document.addEventListener('click', e => {
       const id = b.dataset.id, nm = pname(d, id);
       mutate(`retire ${nm}`, dd => {
         dd.people = dd.people.filter(p => p.id !== id);
-        dd.flights.forEach(f => { f.pax = (f.pax || []).filter(i => i !== id); if (f.paidBy === id) f.paidBy = ''; });
-        [].concat(dd.stays, dd.acts).forEach(x => { if (x.paidBy === id) x.paidBy = ''; });
+        dd.flights.forEach(f => { f.pax = (f.pax || []).filter(i => i !== id); });
       });
       break;
     }

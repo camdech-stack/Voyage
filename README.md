@@ -1,6 +1,6 @@
 # Voyage entre amis
 
-Site d'organisation d'un voyage (programme, vols, logement, activités, budget). Un seul `index.html`, sans framework ni étape de build, publié avec GitHub Pages.
+Site d'organisation d'un voyage (programme, vols, logement, activités). Un seul `index.html`, sans framework ni étape de build, publié avec GitHub Pages.
 
 ## Comment ça marche
 
