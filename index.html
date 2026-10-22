@@ -191,10 +191,8 @@ fieldset{border:0;margin:0 0 12px;padding:0}
 
 /* vague d'accès */
 #wave{position:fixed;inset:0;z-index:200;pointer-events:none;overflow:hidden}
-.wv{position:absolute;top:0;left:0;height:100%;width:250vw;transform:translateX(-250vw);animation:wvsweep 2.4s cubic-bezier(.45,.05,.55,.95) forwards;animation-delay:var(--dl)}
-.wv svg{width:100%;height:100%;display:block}
-.wv.foam{--dl:0s;width:30vw;margin-left:222vw}.wv.mid{--dl:.1s}.wv.deep{--dl:.2s}
-@keyframes wvsweep{to{transform:translateX(100vw)}}
+.wv{position:absolute;left:0;bottom:0;width:100vw;height:100vh;overflow:visible;transform-origin:0 100%;transform:scale(0);animation:wvrise 2.9s forwards}
+@keyframes wvrise{0%{transform:scale(0);animation-timing-function:cubic-bezier(.3,.55,.35,1)}45%{transform:scale(1)}55%{transform:scale(1);animation-timing-function:cubic-bezier(.65,0,.75,.4)}100%{transform:scale(0)}}
 /* animations décoratives au premier plan */
 #fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:45}
 .sw{position:absolute;left:0;will-change:transform}
@@ -1218,12 +1216,18 @@ function fxSetOn(on) { FX.on = on; LS.set('trip:fx', on); if (!on) $('#fx').inne
 /* ============ vague qui balaie l'écran après la saisie du code ============ */
 function waveTransition(swap) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { swap(false); return; }
-  const w = document.createElement('div'), big = 'M10 0 H240 Q250 12.5 240 25 T240 50 T240 75 T240 100 H10 Q0 87.5 10 75 T10 50 T10 25 T10 0Z', crest = 'M5 0 H25 Q30 12.5 25 25 T25 50 T25 75 T25 100 H5 Q0 87.5 5 75 T5 50 T5 25 T5 0Z';
+  /* vague en arc de cercle : naît dans le coin bas-gauche et monte en recouvrant l'écran, puis se retire */
+  const arc = (R, a, f) => {
+    let d = 'M0 100';
+    for (let t = 0; t <= 90.01; t += 1.5) { const r = R + a * Math.sin(t * Math.PI / 180 * f), x = r * Math.cos(t * Math.PI / 180), y = 100 - r * Math.sin(t * Math.PI / 180); d += ` L${x.toFixed(2)} ${y.toFixed(2)}`; }
+    return d + 'Z';
+  };
+  const w = document.createElement('div');
   w.id = 'wave'; w.setAttribute('aria-hidden', 'true');
-  w.innerHTML = [['deep', '#136a98', big, 250], ['mid', '#2b9cc9', big, 250], ['foam', '#ffffff', crest, 30]].map(([c, f, d, vw]) => `<div class="wv ${c}"><svg viewBox="0 0 ${vw} 100" preserveAspectRatio="none"><path d="${d}" fill="${f}"/></svg></div>`).join('');
+  w.innerHTML = `<svg class="wv" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${arc(160, 1.5, 30)}" fill="#ffffff"/><path d="${arc(155, 1.2, 22)}" fill="#2b9cc9"/><path d="${arc(149, .9, 16)}" fill="#136a98"/></svg>`;
   document.body.appendChild(w);
-  setTimeout(() => swap(true), 1300);
-  setTimeout(() => w.remove(), 2800);
+  setTimeout(() => swap(true), 1450);
+  setTimeout(() => w.remove(), 3000);
 }
 
 boot();
