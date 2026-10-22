@@ -193,6 +193,41 @@ table.bal thead th{border-top:0;font-size:.78rem;color:var(--basalt-2);text-tran
 #gate h2{font-size:1.3rem;margin-bottom:8px}
 #gate .wrap{max-width:560px}
 
+
+/* animations décoratives au premier plan */
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:45}
+.sw{position:absolute;left:0;will-change:transform}
+.sw.r{animation:crossR var(--d,20s) linear forwards}
+.sw.l{animation:crossL var(--d,20s) linear forwards}
+@keyframes crossR{from{transform:translateX(-340px)}to{transform:translateX(calc(100vw + 120px))}}
+@keyframes crossL{from{transform:translateX(calc(100vw + 120px))}to{transform:translateX(-340px)}}
+.sw .bob{animation:bob var(--b,3.4s) ease-in-out infinite}
+.sw.l .flip{transform:scaleX(-1)}
+.sw svg{display:block;overflow:visible;filter:drop-shadow(0 6px 6px rgba(10,40,60,.25))}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+.tailw{animation:wag .6s ease-in-out infinite alternate}
+@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+.flap{animation:flap 1.7s ease-in-out infinite alternate}
+@keyframes flap{from{transform:rotate(-16deg)}to{transform:rotate(20deg)}}
+.school{position:relative}
+.school svg{position:absolute}
+.volc{position:absolute;bottom:0;width:clamp(150px,26vw,260px);transform:translateY(103%);transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.volc.left{left:2vw}.volc.right{right:2vw}
+.volc.up{transform:translateY(0)}
+.volc svg{display:block;width:100%;height:auto;overflow:visible}
+.volc.shake svg{animation:rumble .12s linear infinite}
+@keyframes rumble{0%{transform:translateX(-1.2px)}50%{transform:translateX(1.2px)}100%{transform:translateX(-1.2px)}}
+.vglow{position:absolute;left:50%;top:27%;width:140%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(255,150,60,.55) 0,rgba(255,90,30,.22) 38%,transparent 66%);opacity:0;transition:opacity .8s}
+.volc.shake .vglow{opacity:1;animation:glow .5s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.7}to{opacity:1}}
+.vemb{position:absolute;left:50%;top:26%;width:0;height:0}
+.ember{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(circle,#fff0b0 0,#ff9a3c 55%,#e4572e 100%);box-shadow:0 0 8px 2px rgba(255,122,41,.8);animation:ember var(--t,2s) forwards}
+@keyframes ember{0%{transform:translate(0,0) scale(1);opacity:1;animation-timing-function:cubic-bezier(.2,.7,.4,1)}45%{transform:translate(calc(var(--dx)*.7),var(--dy)) scale(1);opacity:1;animation-timing-function:cubic-bezier(.5,0,.9,.6)}100%{transform:translate(var(--dx),calc(var(--dy)*.12 + 110px)) scale(.4);opacity:0}}
+.smoke{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,rgba(150,144,146,.85) 0,rgba(110,104,106,.6) 55%,transparent 72%);animation:smoke 4.2s ease-out forwards}
+@keyframes smoke{from{transform:translate(0,0) scale(.4);opacity:.85}to{transform:translate(var(--sx,0),-230px) scale(2.8);opacity:0}}
+.lv{animation:lava 1.2s ease-in-out infinite alternate}
+@keyframes lava{from{opacity:.55}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#fx{display:none}}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--basalt);color:var(--cream);padding:11px 18px;border-radius:999px;z-index:60;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:.95rem;text-align:center}
 @media(prefers-reduced-motion:no-preference){.toast{animation:up .25s ease-out}@keyframes up{from{opacity:0;transform:translate(-50%,10px)}}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
@@ -202,18 +237,15 @@ table.bal thead th{border-top:0;font-size:.78rem;color:var(--basalt-2);text-tran
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <g id="rt">
-      <path d="M0 80 L50 48 L90 66 L150 28 L205 62 L260 40 L320 74 L380 46 L440 78 L500 52 L560 76 L620 56 L690 78 L750 60 L800 80 V130 H0Z" fill="#3b6f86"/>
-      <path d="M0 88 L70 58 L120 78 L190 36 L250 76 L310 56 L370 84 L450 50 L520 82 L590 62 L660 84 L730 66 L800 88 V130 H0Z" fill="#1f5a52"/>
-      <path d="M0 96 L90 76 L170 92 L260 70 L350 94 L450 76 L550 96 L650 78 L740 94 L800 96 V130 H0Z" fill="#2F6B4F"/>
-      <path d="M0 98 Q25 90 50 98 T100 98 T150 98 T200 98 T250 98 T300 98 T350 98 T400 98 T450 98 T500 98 T550 98 T600 98 T650 98 T700 98 T750 98 T800 98 V130 H0Z" fill="#2b9cc9"/>
-      <path d="M0 107 Q25 99 50 107 T100 107 T150 107 T200 107 T250 107 T300 107 T350 107 T400 107 T450 107 T500 107 T550 107 T600 107 T650 107 T700 107 T750 107 T800 107 V130 H0Z" fill="#1a7fb0"/>
-      <path d="M0 116 Q25 108 50 116 T100 116 T150 116 T200 116 T250 116 T300 116 T350 116 T400 116 T450 116 T500 116 T550 116 T600 116 T650 116 T700 116 T750 116 T800 116 V130 H0Z" fill="#136a98"/>
-      <path d="M0 125 Q25 117 50 125 T100 125 T150 125 T200 125 T250 125 T300 125 T350 125 T400 125 T450 125 T500 125 T550 125 T600 125 T650 125 T700 125 T750 125 T800 125 V130 H0Z" fill="#fbf6ec"/>
-    </g>
     <symbol id="ridges" viewBox="0 0 3200 130" preserveAspectRatio="xMidYMax slice">
       <circle cx="1545" cy="42" r="18" fill="#E4572E" opacity=".95"/>
-      <use href="#rt" x="0"/><use href="#rt" x="799"/><use href="#rt" x="1598"/><use href="#rt" x="2397"/>
+      <path d="M0 80 L50 48 L90 66 L150 28 L205 62 L260 40 L320 74 L380 46 L440 78 L500 52 L560 76 L620 56 L690 78 L750 60 L800 80 L850 48 L890 66 L950 28 L1005 62 L1060 40 L1120 74 L1180 46 L1240 78 L1300 52 L1360 76 L1420 56 L1490 78 L1550 60 L1600 80 L1650 48 L1690 66 L1750 28 L1805 62 L1860 40 L1920 74 L1980 46 L2040 78 L2100 52 L2160 76 L2220 56 L2290 78 L2350 60 L2400 80 L2450 48 L2490 66 L2550 28 L2605 62 L2660 40 L2720 74 L2780 46 L2840 78 L2900 52 L2960 76 L3020 56 L3090 78 L3150 60 L3200 80 V130 H0Z" fill="#3b6f86"/>
+      <path d="M0 88 L70 58 L120 78 L190 36 L250 76 L310 56 L370 84 L450 50 L520 82 L590 62 L660 84 L730 66 L800 88 L870 58 L920 78 L990 36 L1050 76 L1110 56 L1170 84 L1250 50 L1320 82 L1390 62 L1460 84 L1530 66 L1600 88 L1670 58 L1720 78 L1790 36 L1850 76 L1910 56 L1970 84 L2050 50 L2120 82 L2190 62 L2260 84 L2330 66 L2400 88 L2470 58 L2520 78 L2590 36 L2650 76 L2710 56 L2770 84 L2850 50 L2920 82 L2990 62 L3060 84 L3130 66 L3200 88 V130 H0Z" fill="#1f5a52"/>
+      <path d="M0 96 L90 76 L170 92 L260 70 L350 94 L450 76 L550 96 L650 78 L740 94 L800 96 L890 76 L970 92 L1060 70 L1150 94 L1250 76 L1350 96 L1450 78 L1540 94 L1600 96 L1690 76 L1770 92 L1860 70 L1950 94 L2050 76 L2150 96 L2250 78 L2340 94 L2400 96 L2490 76 L2570 92 L2660 70 L2750 94 L2850 76 L2950 96 L3050 78 L3140 94 L3200 96 V130 H0Z" fill="#2F6B4F"/>
+      <path d="M0 98 Q25 90 50 98 T100 98 T150 98 T200 98 T250 98 T300 98 T350 98 T400 98 T450 98 T500 98 T550 98 T600 98 T650 98 T700 98 T750 98 T800 98 T850 98 T900 98 T950 98 T1000 98 T1050 98 T1100 98 T1150 98 T1200 98 T1250 98 T1300 98 T1350 98 T1400 98 T1450 98 T1500 98 T1550 98 T1600 98 T1650 98 T1700 98 T1750 98 T1800 98 T1850 98 T1900 98 T1950 98 T2000 98 T2050 98 T2100 98 T2150 98 T2200 98 T2250 98 T2300 98 T2350 98 T2400 98 T2450 98 T2500 98 T2550 98 T2600 98 T2650 98 T2700 98 T2750 98 T2800 98 T2850 98 T2900 98 T2950 98 T3000 98 T3050 98 T3100 98 T3150 98 T3200 98 V130 H0Z" fill="#2b9cc9"/>
+      <path d="M0 107 Q25 99 50 107 T100 107 T150 107 T200 107 T250 107 T300 107 T350 107 T400 107 T450 107 T500 107 T550 107 T600 107 T650 107 T700 107 T750 107 T800 107 T850 107 T900 107 T950 107 T1000 107 T1050 107 T1100 107 T1150 107 T1200 107 T1250 107 T1300 107 T1350 107 T1400 107 T1450 107 T1500 107 T1550 107 T1600 107 T1650 107 T1700 107 T1750 107 T1800 107 T1850 107 T1900 107 T1950 107 T2000 107 T2050 107 T2100 107 T2150 107 T2200 107 T2250 107 T2300 107 T2350 107 T2400 107 T2450 107 T2500 107 T2550 107 T2600 107 T2650 107 T2700 107 T2750 107 T2800 107 T2850 107 T2900 107 T2950 107 T3000 107 T3050 107 T3100 107 T3150 107 T3200 107 V130 H0Z" fill="#1a7fb0"/>
+      <path d="M0 116 Q25 108 50 116 T100 116 T150 116 T200 116 T250 116 T300 116 T350 116 T400 116 T450 116 T500 116 T550 116 T600 116 T650 116 T700 116 T750 116 T800 116 T850 116 T900 116 T950 116 T1000 116 T1050 116 T1100 116 T1150 116 T1200 116 T1250 116 T1300 116 T1350 116 T1400 116 T1450 116 T1500 116 T1550 116 T1600 116 T1650 116 T1700 116 T1750 116 T1800 116 T1850 116 T1900 116 T1950 116 T2000 116 T2050 116 T2100 116 T2150 116 T2200 116 T2250 116 T2300 116 T2350 116 T2400 116 T2450 116 T2500 116 T2550 116 T2600 116 T2650 116 T2700 116 T2750 116 T2800 116 T2850 116 T2900 116 T2950 116 T3000 116 T3050 116 T3100 116 T3150 116 T3200 116 V130 H0Z" fill="#136a98"/>
+      <path d="M0 125 Q25 117 50 125 T100 125 T150 125 T200 125 T250 125 T300 125 T350 125 T400 125 T450 125 T500 125 T550 125 T600 125 T650 125 T700 125 T750 125 T800 125 T850 125 T900 125 T950 125 T1000 125 T1050 125 T1100 125 T1150 125 T1200 125 T1250 125 T1300 125 T1350 125 T1400 125 T1450 125 T1500 125 T1550 125 T1600 125 T1650 125 T1700 125 T1750 125 T1800 125 T1850 125 T1900 125 T1950 125 T2000 125 T2050 125 T2100 125 T2150 125 T2200 125 T2250 125 T2300 125 T2350 125 T2400 125 T2450 125 T2500 125 T2550 125 T2600 125 T2650 125 T2700 125 T2750 125 T2800 125 T2850 125 T2900 125 T2950 125 T3000 125 T3050 125 T3100 125 T3150 125 T3200 125 V130 H0Z" fill="#fbf6ec"/>
     </symbol>
   </defs>
 </svg>
@@ -269,6 +301,7 @@ table.bal thead th{border-top:0;font-size:.78rem;color:var(--basalt-2);text-tran
 <dialog id="lb" aria-label="Photo"><div class="sheet"><button class="x" type="button" data-act="closelb" aria-label="Fermer">×</button><div id="lb-c"></div></div></dialog>
 <input type="file" id="photoIn" accept="image/*" hidden>
 <div id="toast" class="toast" role="status" hidden></div>
+<div id="fx" aria-hidden="true"></div>
 
 <script>
 'use strict';
@@ -621,7 +654,7 @@ document.addEventListener('submit', async e => {
 function enterApp() {
   S.ready = true; $('#gate').hidden = true; $('#app').hidden = false;
   try { S.tab = sessionStorage.getItem('trip:tab') || 'prog'; } catch (e) { S.tab = 'prog'; }
-  render(); startPolling();
+  render(); startPolling(); fxTick();
   if (canEdit() && !S.who) askWho();
 }
 function askWho() {
@@ -905,6 +938,10 @@ function rSettings(d) {
       <p class="muted" style="margin-bottom:0">Après un changement, les autres devront saisir le nouveau code.</p>` : ''}
     <div class="row-actions" style="margin-top:10px"><button class="btn small ghost" type="button" data-act="lock">Verrouiller sur cet appareil</button></div>
   </div>`}
+  <div class="set-block"><h3>Affichage</h3>
+    <div class="checks"><label><input type="checkbox" id="s-fx" ${FX.on ? 'checked' : ''}>Animations (volcan, poissons, tortues, requins)</label></div>
+    <p class="muted" style="margin:8px 0 0">Elles s’arrêtent d’elles-mêmes si ton appareil demande moins de mouvement.</p>
+  </div>
   <div class="set-block"><h3>Copie et historique</h3>
     <div class="row-actions"><button class="btn small ghost" type="button" data-act="backup">Télécharger une copie (JSON)</button>
     ${ghUrl ? `<a class="btn small ghost" href="${esc(ghUrl)}" target="_blank" rel="noopener noreferrer">Historique sur GitHub</a>` : ''}</div>
@@ -1107,6 +1144,7 @@ document.addEventListener('click', e => {
   }
 });
 document.addEventListener('change', e => {
+  if (e.target.id === 's-fx') { fxSetOn(e.target.checked); return; }
   const t = e.target, d = view(); if (!d || !canEdit()) return;
   if (t.dataset.pick !== undefined && t.value) {
     const id = t.dataset.pick, day = t.value, a = d.acts.find(x => x.id === id);
@@ -1131,6 +1169,73 @@ document.addEventListener('submit', async e => {
     toast('Code changé : donne-le aux autres.');
   }
 });
+
+/* ============ animations décoratives (poissons, tortues, requins, volcan) ============ */
+const FX = {on:LS.get('trip:fx') !== false, timer:null, lastVolc:0};
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const FISH_COLORS = [['#ff9f43', '#ffd166'], ['#27b3d6', '#8fe3f2'], ['#f2c14e', '#fff3b0'], ['#e4572e', '#ffb199'], ['#7b8cde', '#cdd5ff']];
+const fishSvg = (w, c) => `<svg viewBox="0 0 60 30" width="${w}" height="${w / 2}"><path class="tailw" style="transform-origin:44px 15px" d="M44 15 L58 4 L58 26 Z" fill="${c[0]}"/><ellipse cx="26" cy="15" rx="22" ry="11" fill="${c[0]}"/><path d="M12 15 Q26 6 40 15 Q26 24 12 15Z" fill="${c[1]}" opacity=".55"/><path d="M22 5 Q30 0 36 6Z" fill="${c[0]}"/><circle cx="10" cy="12" r="2.6" fill="#fff"/><circle cx="9.5" cy="12" r="1.3" fill="#14283a"/></svg>`;
+const TURTLE = w => `<svg viewBox="0 0 130 70" width="${w}" height="${w * 70 / 130}"><path class="flap" style="transform-origin:34px 46px;animation-delay:-.9s" d="M34 46 Q14 64 6 58 Q22 46 30 40Z" fill="#7da35a"/><path d="M24 44 L12 49 L24 50Z" fill="#7da35a"/><path d="M24 44 C24 14 100 14 100 44 Z" fill="#2F6B4F"/><path d="M42 40 C44 26 52 20 62 18 M62 18 C72 20 80 26 82 40 M62 18 L62 40 M42 40 L82 40" stroke="#1d4a37" stroke-width="2" fill="none"/><path d="M22 44 H102 Q96 53 62 53 Q28 53 22 44Z" fill="#d8c48a"/><ellipse cx="112" cy="39" rx="14" ry="9" fill="#8bb36a"/><circle cx="118" cy="36" r="2.2" fill="#14283a"/><path class="flap" style="transform-origin:84px 46px" d="M84 46 Q108 70 126 62 Q104 48 90 40Z" fill="#8bb36a"/></svg>`;
+const SHARK = w => `<svg viewBox="0 -4 220 80" width="${w}" height="${w * 80 / 220}"><g class="tailw" style="transform-origin:26px 42px"><path d="M28 42 L2 12 Q14 40 12 42 Q14 46 2 74 Z" fill="#5f7a8b"/></g><path d="M22 42 C52 18 112 12 162 28 C182 34 197 40 210 42 C197 46 182 52 162 56 C112 68 52 62 22 42 Z" fill="#6b8494"/><path d="M42 49 C92 62 152 58 204 43 C162 52 102 56 42 49Z" fill="#e9f0f3"/><path d="M107 20 L124 -3 L137 25Z" fill="#5f7a8b"/><path d="M132 48 L116 73 L146 53Z" fill="#5f7a8b"/><path d="M62 53 L52 64 L72 57Z" fill="#5f7a8b"/><circle cx="186" cy="36" r="2.6" fill="#14283a"/><path d="M188 47 Q198 50 208 44" stroke="#3d5260" stroke-width="1.6" fill="none"/><path d="M152 33 L150 45 M158 33 L156 45 M164 34 L162 44" stroke="#4f6877" stroke-width="1.4" fill="none"/></svg>`;
+function fxSwim(kind) {
+  const fx = $('#fx'), dir = Math.random() < .5 ? 'r' : 'l', el = document.createElement('div');
+  el.className = 'sw ' + dir; el.style.top = rnd(8, 82) + 'vh';
+  let html, dur;
+  if (kind === 'turtle') { html = TURTLE(Math.min(rnd(90, 130), innerWidth * .34)); dur = rnd(24, 34); }
+  else if (kind === 'shark') { html = SHARK(Math.min(rnd(170, 240), innerWidth * .6)); dur = rnd(15, 21); }
+  else {
+    const n = 3 + Math.floor(Math.random() * 3), c = pick(FISH_COLORS), w = Math.min(rnd(36, 54), innerWidth * .13);
+    html = `<div class="school" style="width:${w * 3.4}px;height:${w * 1.5}px">` + Array.from({length:n}, (_, i) => `<span style="position:absolute;left:${i * w * .62 + rnd(0, 8)}px;top:${rnd(0, w * .9)}px">${fishSvg(w * rnd(.85, 1.1), c)}</span>`).join('') + '</div>';
+    dur = rnd(14, 20);
+  }
+  el.style.setProperty('--d', dur + 's');
+  el.innerHTML = `<div class="bob" style="--b:${rnd(2.6, 4)}s"><div class="flip">${html}</div></div>`;
+  el.addEventListener('animationend', e => { if (e.target === el) el.remove(); });
+  fx.appendChild(el);
+}
+const VOLCANO = `<svg viewBox="0 0 220 150"><path d="M0 150 L72 46 Q110 30 148 46 L220 150Z" fill="#3b2f33"/><path d="M110 33 Q130 36 148 46 L220 150 L120 150Z" fill="#4a3a3e"/><path class="lv" d="M100 44 Q92 70 100 92 Q94 112 102 132" stroke="#ff5a1f" stroke-width="5" fill="none" stroke-linecap="round"/><path class="lv" style="animation-delay:-.6s" d="M122 44 Q130 66 124 88 Q132 108 126 128" stroke="#ff7a29" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="110" cy="40" rx="30" ry="7" fill="#ff7a29"/><ellipse cx="110" cy="39" rx="20" ry="4" fill="#ffd166"/><path d="M0 150 L0 128 Q50 112 90 150Z" fill="#2F6B4F"/><path d="M220 150 L220 126 Q170 112 135 150Z" fill="#2F6B4F"/></svg>`;
+function fxVolcano() {
+  const fx = $('#fx'), el = document.createElement('div');
+  el.className = 'volc ' + (Math.random() < .5 ? 'left' : 'right');
+  el.innerHTML = `<div class="vglow"></div>${VOLCANO}<div class="vemb"></div>`;
+  fx.appendChild(el);
+  const emb = $('.vemb', el), T = (f, t) => setTimeout(() => { if (el.isConnected) f(); }, t);
+  const burst = () => {
+    for (let i = 0; i < 16; i++) {
+      const b = document.createElement('span'), sz = rnd(5, 11);
+      b.className = 'ember'; b.style.cssText = `width:${sz}px;height:${sz}px;margin:${-sz / 2}px 0 0 ${-sz / 2}px;--dx:${rnd(-120, 120)}px;--dy:${-rnd(150, 300)}px;--t:${rnd(1.5, 2.5)}s`;
+      b.addEventListener('animationend', () => b.remove()); emb.appendChild(b);
+    }
+  };
+  const smoke = () => {
+    const sm = document.createElement('span'); sm.className = 'smoke'; sm.style.setProperty('--sx', rnd(-50, 50) + 'px');
+    sm.addEventListener('animationend', () => sm.remove()); emb.appendChild(sm);
+  };
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('up')));
+  T(() => el.classList.add('shake'), 1200);
+  [1300, 2800, 4300].forEach(t => T(burst, t));
+  for (let t = 1300; t < 6000; t += 550) T(smoke, t);
+  T(() => el.classList.remove('shake'), 5600);
+  T(() => el.classList.remove('up'), 7000);
+  setTimeout(() => el.remove(), 8800);
+  FX.lastVolc = Date.now();
+}
+function fxAllowed() {
+  return FX.on && S.ready && !document.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function fxTick() {
+  clearTimeout(FX.timer);
+  FX.timer = setTimeout(() => {
+    if (fxAllowed()) {
+      const swimmers = $$('#fx .sw').length, r = Math.random();
+      if (r < .16 && Date.now() - FX.lastVolc > 30000 && !$('#fx .volc')) fxVolcano();
+      else if (swimmers < 3) fxSwim(r < .5 ? 'fish' : r < .78 ? 'turtle' : 'shark');
+    }
+    fxTick();
+  }, rnd(4500, 9000));
+}
+function fxSetOn(on) { FX.on = on; LS.set('trip:fx', on); if (!on) $('#fx').innerHTML = ''; else fxTick(); }
 
 boot();
 </script>
