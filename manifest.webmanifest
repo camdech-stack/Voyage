@@ -1,7 +1,7 @@
 {
-  "name": "Voyage entre amis",
-  "short_name": "Voyage",
-  "description": "Organisation d'un voyage entre amis",
+  "name": "La Réunion",
+  "short_name": "Réunion",
+  "description": "Organisation du voyage à La Réunion",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",

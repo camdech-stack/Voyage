@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Voyage entre amis</title>
+<title>La Réunion</title>
 <meta name="description" content="Organisation d'un voyage entre amis">
 <meta name="theme-color" content="#14466a">
 <meta name="color-scheme" content="light">
@@ -188,6 +188,13 @@ fieldset{border:0;margin:0 0 12px;padding:0}
 #gate .wrap{max-width:560px}
 
 
+
+/* vague d'accès */
+#wave{position:fixed;inset:0;z-index:200;pointer-events:none;overflow:hidden}
+.wv{position:absolute;top:0;left:0;height:100%;width:250vw;transform:translateX(-250vw);animation:wvsweep 2.4s cubic-bezier(.45,.05,.55,.95) forwards;animation-delay:var(--dl)}
+.wv svg{width:100%;height:100%;display:block}
+.wv.foam{--dl:0s;width:30vw;margin-left:222vw}.wv.mid{--dl:.1s}.wv.deep{--dl:.2s}
+@keyframes wvsweep{to{transform:translateX(100vw)}}
 /* animations décoratives au premier plan */
 #fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:45}
 .sw{position:absolute;left:0;will-change:transform}
@@ -249,7 +256,7 @@ fieldset{border:0;margin:0 0 12px;padding:0}
 <!-- Porte d'entrée : chargement, code, première configuration -->
 <section id="gate" hidden aria-live="polite">
   <div class="wrap">
-    <h1>Voyage entre amis</h1>
+    <h1>La Réunion</h1>
     <div class="box" id="gatebox"></div>
   </div>
   <svg class="ridge" aria-hidden="true"><use href="#ridges"/></svg>
@@ -636,19 +643,19 @@ document.addEventListener('submit', async e => {
     else if (code !== $('#gcode2').value) err.textContent = 'Les deux codes sont différents.';
     else {
       S.code = code; S.salt = newSalt(); S.data = seedData(); S.sha = null; S.etag = null;
-      enterApp(); mutate('Création du voyage', d => d); return;
+      waveTransition(w => { enterApp(w); mutate('Création du voyage', d => d); }); return;
     }
     btn.disabled = false; btn.textContent = 'Créer le voyage'; return;
   }
-  try { S.data = normalize(await unseal(S.env, code)); S.code = code; LS.set('trip:code', code); enterApp(); }
+  try { S.data = normalize(await unseal(S.env, code)); S.code = code; LS.set('trip:code', code); waveTransition(w => enterApp(w)); }
   catch (er) { err.textContent = 'Code incorrect.'; btn.disabled = false; btn.textContent = 'Ouvrir'; $('#gcode').select(); }
 });
 
-function enterApp() {
+function enterApp(waved) {
   S.ready = true; $('#gate').hidden = true; $('#app').hidden = false;
   try { S.tab = sessionStorage.getItem('trip:tab') || 'prog'; } catch (e) { S.tab = 'prog'; }
   render(); startPolling(); fxTick(true);
-  if (canEdit() && !S.who) askWho();
+  if (canEdit() && !S.who) setTimeout(askWho, waved ? 1500 : 0);
 }
 function askWho() {
   const d = view(); if (!d || !d.people.length) return;
@@ -1207,6 +1214,17 @@ function fxTick(first) {
   }, first ? 3500 : rnd(15000, 28000));
 }
 function fxSetOn(on) { FX.on = on; LS.set('trip:fx', on); if (!on) $('#fx').innerHTML = ''; else fxTick(true); }
+
+/* ============ vague qui balaie l'écran après la saisie du code ============ */
+function waveTransition(swap) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { swap(false); return; }
+  const w = document.createElement('div'), big = 'M10 0 H240 Q250 12.5 240 25 T240 50 T240 75 T240 100 H10 Q0 87.5 10 75 T10 50 T10 25 T10 0Z', crest = 'M5 0 H25 Q30 12.5 25 25 T25 50 T25 75 T25 100 H5 Q0 87.5 5 75 T5 50 T5 25 T5 0Z';
+  w.id = 'wave'; w.setAttribute('aria-hidden', 'true');
+  w.innerHTML = [['deep', '#136a98', big, 250], ['mid', '#2b9cc9', big, 250], ['foam', '#ffffff', crest, 30]].map(([c, f, d, vw]) => `<div class="wv ${c}"><svg viewBox="0 0 ${vw} 100" preserveAspectRatio="none"><path d="${d}" fill="${f}"/></svg></div>`).join('');
+  document.body.appendChild(w);
+  setTimeout(() => swap(true), 1300);
+  setTimeout(() => w.remove(), 2800);
+}
 
 boot();
 </script>
