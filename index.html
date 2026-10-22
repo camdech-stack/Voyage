@@ -79,7 +79,7 @@ button.av{cursor:zoom-in}
 .tabs button[role=tab].gear{flex:0 0 44px;font-size:1.2rem}
 @media(min-width:480px){.tabs button[role=tab]{font-size:.95rem}}
 
-main{padding:18px 0 90px}
+main{padding:30px 0 90px}
 .section-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:22px 0 10px;flex-wrap:wrap}
 .section-h h2{font-size:1.35rem}
 .muted{color:var(--basalt-2);font-size:.92rem}
@@ -105,12 +105,20 @@ main{padding:18px 0 90px}
 .pax{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 
 /* programme */
-.todo-box{background:#fff;border:1.5px solid var(--lava);border-radius:var(--r);padding:12px 14px;margin-bottom:16px}
-.todo-box h2{font-size:1.1rem;color:var(--lava-d);margin-bottom:6px}
+.todo-box{background:#fff;border:1.5px solid var(--lava);border-radius:20px;padding:14px 16px;margin-bottom:22px}
+.todo-box h2{font-size:1.1rem;color:var(--lava-d);margin-bottom:4px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.todo-box h2 small{font-family:var(--font-body);font-size:.82rem;font-weight:500;color:var(--basalt-2)}
 .todo-box ul{list-style:none;margin:0;padding:0}
-.todo-box li button{width:100%;min-height:44px;background:none;border:0;border-top:1px solid var(--mist);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}
-.todo-box li:first-child button{border-top:0}
-.todo-box .ok{color:var(--forest-d);font-weight:700}
+.todo-box li{display:flex;align-items:center;gap:2px;border-top:1px solid var(--mist)}
+.todo-box li:first-child{border-top:0}
+.todo-main{flex:1;min-width:0;min-height:46px;background:none;border:0;text-align:left;display:flex;align-items:center;gap:12px;padding:6px 0;overflow-wrap:anywhere}
+.todo-main .circle{pointer-events:none}
+button.circle-btn{flex:none;width:44px;height:44px;background:none;border:0;display:flex;align-items:center;justify-content:center;padding:0}
+.circle{flex:none;width:26px;height:26px;border-radius:50%;border:2.5px solid var(--lava);background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;font-weight:700;line-height:1}
+.todo-row.done .circle{background:var(--forest);border-color:var(--forest)}
+.todo-row.done .circle::after{content:"✓"}
+.todo-row.done .todo-t{color:var(--basalt-2);text-decoration:line-through}
+.todo-box .ok{color:var(--forest-d);font-weight:700;margin:6px 0 2px}
 .day-head{padding:12px 16px;background:var(--forest);color:var(--cream);position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='90' viewBox='0 0 220 90' fill='none' stroke='%23F6F1E7' stroke-opacity='.13' stroke-width='1.2'%3E%3Cpath d='M-10 70C30 30 70 80 110 45S190 20 230 55'/%3E%3Cpath d='M-10 56C30 16 70 66 110 31S190 6 230 41'/%3E%3Cpath d='M-10 42C30 2 70 52 110 17S190-8 230 27'/%3E%3C/svg%3E");background-size:220px 90px}
 .day-head h3{font-size:1.15rem}
@@ -132,12 +140,15 @@ button.ev:hover{background:var(--mist)}
 .idea select{width:100%}
 
 /* formulaires */
-dialog{border:0;padding:0;background:transparent;max-width:100vw;max-height:100dvh;width:100%;margin:auto}
+dialog{border:0;padding:0 12px;background:transparent;max-width:100vw;max-height:100dvh;width:100%;margin:auto}
 dialog::backdrop{background:rgba(22,33,31,.62)}
-.sheet{background:var(--cream);width:min(560px,100%);margin:0 auto;border-radius:20px 20px 0 0;max-height:94dvh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
-@media(max-width:599px){dialog{margin:auto auto 0}}
-@media(min-width:600px){.sheet{border-radius:20px;margin-top:4dvh}}
-.sheet h2{font-size:1.4rem;margin-bottom:12px}
+.sheet{background:var(--cream);width:min(560px,100%);margin:0 auto;border-radius:24px;max-height:90dvh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.sheet h2{padding:18px 18px 8px;margin:0!important}
+.sheet form.f{display:flex;flex-direction:column;min-height:0;flex:1}
+.fbody{overflow:auto;padding:4px 18px 14px;flex:1;min-height:0}
+.sheet .form-actions{margin:0;padding:12px 18px;border-top:1px solid var(--line);background:var(--cream);flex:none}
+@media(max-width:599px){dialog{margin:auto auto 0;padding-bottom:calc(12px + env(safe-area-inset-bottom))}}
+.sheet h2{font-size:1.4rem}
 .fld{display:block;margin:0 0 12px}
 .fld>span,fieldset legend{display:block;font-size:.85rem;font-weight:700;margin-bottom:4px;color:var(--basalt-2);padding:0}
 input[type=text],input[type=url],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=password],select,textarea{width:100%;min-height:44px;padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff}
@@ -149,7 +160,7 @@ fieldset{border:0;margin:0 0 12px;padding:0}
 .form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end}
 .form-actions .sp{flex:1}
 .err{color:var(--lava-d);min-height:1.3em;font-size:.92rem;margin:6px 0}
-#lb .sheet{background:var(--basalt);text-align:center;border-radius:20px;padding:16px;position:relative}
+#lb .sheet{background:var(--basalt);text-align:center;padding:16px;position:relative;display:block;overflow:auto}
 #lb img{max-width:100%;max-height:70dvh;border-radius:14px}
 #lb h2{color:var(--cream);font-size:1.1rem;margin:8px 0 0}
 .x{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(246,241,231,.15);color:var(--cream);font-size:1.4rem}
@@ -604,8 +615,8 @@ function enterApp() {
 }
 function askWho() {
   const d = view(); if (!d || !d.people.length) return;
-  showDlg(`<div class="sheet"><h2>Qui es-tu ?</h2><p class="muted">Ton prénom signe tes modifications. Tu pourras le changer dans les Réglages.</p>
-    <div class="checks">${d.people.map(p => `<button type="button" class="btn ghost" data-act="whoset" data-name="${esc(p.name)}">${esc(p.name)}</button>`).join('')}</div></div>`);
+  showDlg(`<div class="sheet"><h2>Qui es-tu ?</h2><div class="fbody"><p class="muted" style="margin-top:0">Ton prénom signe tes modifications. Tu pourras le changer dans les Réglages.</p>
+    <div class="checks">${d.people.map(p => `<button type="button" class="btn ghost" data-act="whoset" data-name="${esc(p.name)}">${esc(p.name)}</button>`).join('')}</div></div></div>`);
 }
 
 /* ============ rendu ============ */
@@ -711,14 +722,19 @@ function eventsOf(d, day) {
 function rProgram(d) {
   const trip = rangeDays(d.trip.start, d.trip.end), days = allDays(d), edit = canEdit();
   /* reste à caler */
-  const todo = [];
-  if (!d.flights.some(f => f.kind === 'aller')) todo.push(['vols', 'Vol aller à ajouter']);
-  if (!d.flights.some(f => f.kind === 'retour')) todo.push(['vols', 'Vol retour à ajouter']);
-  const nm = nightsMissing(d); if (nm.length) todo.push(['log', `${nm.length} nuit${nm.length > 1 ? 's' : ''} sans logement`]);
-  const tr = d.acts.filter(a => a.booking === 'todo'); if (tr.length) todo.push(['act', `${tr.length} activité${tr.length > 1 ? 's' : ''} à réserver`]);
-  let h = `<div class="todo-box"><h2>Reste à caler</h2>${todo.length
-    ? `<ul>${todo.map(([tab, t]) => `<li><button type="button" data-act="tab" data-tab="${tab}"><span>${esc(t)}</span><span aria-hidden="true">›</span></button></li>`).join('')}</ul>`
-    : '<p class="ok" style="margin:4px 0">Tout est calé !</p>'}</div>`;
+  const nm = nightsMissing(d);
+  const todo = [
+    {tab:'vols', t:'Ajouter le vol aller', done:d.flights.some(f => f.kind === 'aller')},
+    {tab:'vols', t:'Ajouter le vol retour', done:d.flights.some(f => f.kind === 'retour')},
+    {tab:'log', t:nm.length ? `Logement : ${nm.length} nuit${nm.length > 1 ? 's' : ''} à caler` : 'Logement pour toutes les nuits', done:!nm.length}
+  ];
+  d.acts.filter(a => a.booking === 'todo' || a.booking === 'done').forEach(a => todo.push({tab:'act', t:'Réserver : ' + a.title, done:a.booking === 'done', id:a.id}));
+  const nDone = todo.filter(x => x.done).length;
+  let h = `<div class="todo-box"><h2>Reste à caler <small>${nDone}/${todo.length}</small></h2><ul>${todo.map(x => {
+    const main = `<button type="button" class="todo-main" data-act="tab" data-tab="${x.tab}">${x.id ? '' : '<span class="circle" aria-hidden="true"></span>'}<span class="todo-t">${esc(x.t)}</span></button>`;
+    const circ = x.id ? (edit ? `<button type="button" class="circle-btn" data-act="togglebook" data-id="${esc(x.id)}" aria-pressed="${x.done}" aria-label="${x.done ? 'Réservé : remettre à réserver' : 'Marquer comme réservé'}"><span class="circle"></span></button>` : '<span class="circle-btn"><span class="circle"></span></span>') : '';
+    return `<li class="todo-row${x.done ? ' done' : ''}">${circ}${main}</li>`;
+  }).join('')}</ul>${nDone === todo.length ? '<p class="ok">Tout est calé !</p>' : ''}</div>`;
   /* jours */
   h += days.map(day => {
     const n = trip.indexOf(day), ev = eventsOf(d, day);
@@ -947,9 +963,9 @@ function openForm(coll, id, defaults) {
   const d = view(), cur = id ? d[coll].find(x => x.id === id) : null;
   const vals = cur || Object.assign({}, defaults);
   formCtx = {coll, id: id || uid(), isNew: !cur};
-  showDlg(`<div class="sheet"><h2>${cur ? 'Modifier' : 'Ajouter'} ${cur ? 'le' : 'un'} ${NOUN[coll]}</h2>
-    <form class="f" novalidate>${FIELDS[coll].map(f => fieldHtml(f, vals[f.n], d)).join('')}
-    <div class="err" role="alert"></div>
+  showDlg(`<div class="sheet"><h2>${cur ? 'Modifier' : 'Ajouter'} ${coll === 'acts' ? (cur ? 'l’' : 'une ') : (cur ? 'le ' : 'un ')}${NOUN[coll]}</h2>
+    <form class="f" novalidate><div class="fbody">${FIELDS[coll].map(f => fieldHtml(f, vals[f.n], d)).join('')}
+    <div class="err" role="alert"></div></div>
     <div class="form-actions">${cur ? '<button type="button" class="btn danger small" data-act="delitem">Supprimer</button>' : ''}<span class="sp"></span>
     <button type="button" class="btn ghost small" data-act="closedlg">Annuler</button><button type="submit" class="btn small">Enregistrer</button></div></form></div>`);
 }
@@ -1037,6 +1053,12 @@ document.addEventListener('click', e => {
       break;
     }
     case 'edit': openForm(b.dataset.coll, b.dataset.id); break;
+    case 'togglebook': {
+      const id = b.dataset.id, a = d.acts.find(x => x.id === id); if (!a) break;
+      const to = a.booking === 'done' ? 'todo' : 'done';
+      mutate(`${to === 'done' ? 'marque réservée' : 'remet à réserver'} l’activité ${a.title}`, dd => { const x = dd.acts.find(y => y.id === id); if (x) x.booking = to; });
+      break;
+    }
     case 'delitem': {
       if (!armed(b, 'Confirmer la suppression') || !formCtx) break;
       const {coll, id} = formCtx, x = d[coll].find(y => y.id === id);
