@@ -133,6 +133,7 @@ button.circle-btn{flex:none;width:30px;height:46px;background:none;border:0;disp
 .ev .dot{flex:0 0 10px;height:10px;border-radius:50%;margin-top:7px;background:var(--lagoon)}
 .ev.stay .dot{background:var(--green)}
 .ev.act .dot{background:var(--lava)}
+.ev.car .dot{background:#C9A24B}
 button.ev{width:100%;background:none;border:0;text-align:left;min-height:44px}
 button.ev:hover{background:var(--mist)}
 .night{margin:0 8px 6px;padding:9px 12px;border-radius:8px;background:#e8f3f8;font-size:.93rem}
@@ -281,6 +282,7 @@ fieldset{border:0;margin:0 0 12px;padding:0}
       <button role="tab" id="t-prog" data-tab="prog" aria-controls="p-prog" type="button">Programme</button>
       <button role="tab" id="t-vols" data-tab="vols" aria-controls="p-vols" type="button">Vols</button>
       <button role="tab" id="t-log" data-tab="log" aria-controls="p-log" type="button">Logement</button>
+      <button role="tab" id="t-car" data-tab="car" aria-controls="p-car" type="button">Voiture</button>
       <button role="tab" id="t-act" data-tab="act" aria-controls="p-act" type="button">Activités</button>
       <button role="tab" id="t-set" data-tab="set" aria-controls="p-set" type="button" class="gear" aria-label="Réglages"><span aria-hidden="true">⚙</span></button>
     </div>
@@ -291,6 +293,7 @@ fieldset{border:0;margin:0 0 12px;padding:0}
     <section role="tabpanel" id="p-prog" aria-labelledby="t-prog" tabindex="0"></section>
     <section role="tabpanel" id="p-vols" aria-labelledby="t-vols" tabindex="0" hidden></section>
     <section role="tabpanel" id="p-log" aria-labelledby="t-log" tabindex="0" hidden></section>
+    <section role="tabpanel" id="p-car" aria-labelledby="t-car" tabindex="0" hidden></section>
     <section role="tabpanel" id="p-act" aria-labelledby="t-act" tabindex="0" hidden></section>
     <section role="tabpanel" id="p-set" aria-labelledby="t-set" tabindex="0" hidden></section>
   </main>
@@ -377,7 +380,7 @@ function seedData() {
     v:1,
     trip:{dest:'La Réunion', start:'2026-12-23', end:'2027-01-03', from:'Paris', to:'Saint-Denis (RUN)'},
     people:names.map((name, i) => ({id:uid(), name, color:COLORS[i % COLORS.length], photo:''})),
-    flights:[], stays:[],
+    flights:[], stays:[], cars:[],
     acts:[
       A('Lever de soleil au Piton de la Fournaise', 'Pas de Bellecombe, La Réunion', 'none', 'Départ très tôt. Prévoir des vêtements chauds et vérifier l’état du volcan.'),
       A('Randonnée dans le cirque de Mafate', 'Cirque de Mafate, La Réunion', 'todo', 'Pas de route : tout se fait à pied. Gîtes à réserver longtemps à l’avance.'),
@@ -399,8 +402,9 @@ function normalize(d) {
   d.trip = Object.assign({dest:'', start:'', end:'', from:'Paris', to:'Saint-Denis (RUN)'}, d.trip || {});
   ['dest', 'start', 'end', 'from', 'to'].forEach(k => d.trip[k] = s(d.trip[k]));
   d.people = (Array.isArray(d.people) ? d.people : []).filter(p => p && typeof p.id === 'string').map(p => ({id:p.id, name:s(p.name), color:/^#[0-9a-f]{6}$/i.test(p.color) ? p.color : COLORS[0], photo:safePhoto(p.photo)}));
-  ['flights', 'stays', 'acts'].forEach(k => d[k] = (Array.isArray(d[k]) ? d[k] : []).filter(x => x && typeof x.id === 'string'));
+  ['flights', 'stays', 'cars', 'acts'].forEach(k => d[k] = (Array.isArray(d[k]) ? d[k] : []).filter(x => x && typeof x.id === 'string'));
   d.flights.forEach(f => { f.pax = Array.isArray(f.pax) ? f.pax : []; });
+  d.cars.forEach(c => { c.drivers = Array.isArray(c.drivers) ? c.drivers : []; });
   d.meta = d.meta && typeof d.meta === 'object' ? d.meta : {};
   d.log = Array.isArray(d.log) ? d.log.slice(0, 60) : [];
   return d;
@@ -696,6 +700,7 @@ function render() {
   $('#p-prog').innerHTML = rProgram(d);
   $('#p-vols').innerHTML = rFlights(d);
   $('#p-log').innerHTML = rStays(d);
+  $('#p-car').innerHTML = rCars(d);
   $('#p-act').innerHTML = rActs(d);
   const sp = $('#p-set');
   if (!(sp.contains(document.activeElement) && document.activeElement.matches('input,textarea,select'))) sp.innerHTML = rSettings(d);
@@ -735,6 +740,7 @@ function allDays(d) {
   const add = v => { if (v && isDay(String(v).slice(0, 10))) s.add(String(v).slice(0, 10)); };
   d.flights.forEach(f => { add(f.dep); add(f.arr); });
   d.stays.forEach(x => { add(x.arrive); add(x.depart); });
+  d.cars.forEach(c => { add(c.pickupAt); add(c.returnAt); });
   d.acts.forEach(a => add(a.day));
   return [...s].sort();
 }
@@ -753,6 +759,11 @@ function eventsOf(d, day) {
   d.stays.forEach(s => {
     if (s.arrive && s.arrive.slice(0, 10) === day) ev.push({time:fTime(s.arrive), kind:'stay', title:'Arrivée au logement', sub:s.name, coll:'stays', id:s.id});
     if (s.depart && s.depart.slice(0, 10) === day) ev.push({time:fTime(s.depart), kind:'stay', title:'Départ du logement', sub:s.name, coll:'stays', id:s.id});
+  });
+  d.cars.forEach(c => {
+    const nm = [c.company, c.model].filter(Boolean).join(' · ');
+    if (c.pickupAt && c.pickupAt.slice(0, 10) === day) ev.push({time:fTime(c.pickupAt), kind:'car', title:'Prise en charge de la voiture', sub:[nm, c.pickup].filter(Boolean).join(' · '), coll:'cars', id:c.id});
+    if (c.returnAt && c.returnAt.slice(0, 10) === day) ev.push({time:fTime(c.returnAt), kind:'car', title:'Restitution de la voiture', sub:[nm, c.returnPlace].filter(Boolean).join(' · '), coll:'cars', id:c.id});
   });
   d.acts.forEach(a => {
     if (a.day === day) ev.push({time:a.time || '', kind:'act', title:a.title, sub:[a.place, a.booking === 'todo' ? 'À réserver' : a.booking === 'done' ? 'Réservé' : ''].filter(Boolean).join(' · '), coll:'acts', id:a.id});
@@ -840,6 +851,25 @@ function rStays(d) {
     }).join('') + '</div>' : '<div class="empty">Aucun logement pour l’instant.</div>');
 }
 
+/* ---- Voiture ---- */
+function rCars(d) {
+  const list = d.cars.slice().sort((a, b) => (a.pickupAt || '9').localeCompare(b.pickupAt || '9')), edit = canEdit();
+  return `<div class="section-h"><h2>Voiture</h2>${edit ? '<button class="btn small" type="button" data-act="add" data-coll="cars">+ Location</button>' : ''}</div>`
+    + (list.length ? '<div class="grid">' + list.map(c => {
+      const who = (c.drivers || []).map(id => { const p = d.people.find(x => x.id === id); return p ? `<span class="tag">${esc(p.name)}</span>` : ''; }).join('');
+      const same = !c.returnPlace || c.returnPlace === c.pickup;
+      const maps = [c.pickup ? `<a href="${esc(mapsUrl(c.pickup))}" target="_blank" rel="noopener noreferrer">${same ? 'Voir sur Maps' : 'Maps · prise en charge'}</a>` : '', !same ? `<a href="${esc(mapsUrl(c.returnPlace))}" target="_blank" rel="noopener noreferrer">Maps · restitution</a>` : ''].join('');
+      const u = safeUrl(c.url);
+      return `<article class="card"><div class="card-body">
+        <span class="tag">Location</span>
+        <h3>${esc([c.company, c.model].filter(Boolean).join(' · ') || 'Voiture')}</h3>
+        <div class="meta"><b>Prise en charge</b> : ${esc(fDT(c.pickupAt) || 'date à définir')}${c.pickup ? ' · ' + esc(c.pickup) : ''}</div>
+        <div class="meta"><b>Restitution</b> : ${esc(fDT(c.returnAt) || 'date à définir')}${c.returnPlace ? ' · ' + esc(c.returnPlace) : ''}</div>
+        ${who ? `<div class="pax">${who}</div>` : ''}${extra(c)}</div>
+        <div class="card-foot">${maps}${u ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">Ouvrir le lien</a>` : ''}<span class="sp"></span>${edit ? `<button class="link" type="button" data-act="edit" data-coll="cars" data-id="${esc(c.id)}">Modifier</button>` : ''}</div></article>`;
+    }).join('') + '</div>' : '<div class="empty">Aucune location pour l’instant.</div>');
+}
+
 /* ---- Activités ---- */
 function actCard(d, a) {
   return `<article class="card"><div class="card-body">
@@ -908,7 +938,7 @@ function rSettings(d) {
 }
 
 /* ============ onglets ============ */
-const TABS = ['prog', 'vols', 'log', 'act', 'set'];
+const TABS = ['prog', 'vols', 'log', 'car', 'act', 'set'];
 function showTab(name, focus) {
   if (!TABS.includes(name)) name = 'prog';
   S.tab = name; try { sessionStorage.setItem('trip:tab', name); } catch (e) {}
@@ -946,17 +976,23 @@ const FIELDS = {
     {n:'name', l:'Nom', req:1}, {n:'address', l:'Adresse (lien Google Maps automatique)'},
     {n:'arrive', l:'Arrivée (date et heure)', t:'datetime-local'}, {n:'depart', l:'Départ (date et heure)', t:'datetime-local'},
     {n:'url', l:'Lien de l’annonce', t:'url'}, {n:'notes', l:'Notes', t:'textarea'}, {n:'priv', l:'Infos privées (code de la porte, wifi…)', t:'textarea'}],
+  cars:[
+    {n:'company', l:'Loueur'}, {n:'model', l:'Modèle ou catégorie'},
+    {n:'pickup', l:'Prise en charge : lieu (lien Google Maps automatique)'}, {n:'pickupAt', l:'Prise en charge (date et heure)', t:'datetime-local'},
+    {n:'returnPlace', l:'Restitution : lieu (vide = même lieu)'}, {n:'returnAt', l:'Restitution (date et heure)', t:'datetime-local'},
+    {n:'drivers', l:'Conducteurs', t:'pax'},
+    {n:'url', l:'Lien de la réservation', t:'url'}, {n:'notes', l:'Notes', t:'textarea'}, {n:'priv', l:'Infos privées (n° de réservation, contrat…)', t:'textarea'}],
   acts:[
     {n:'title', l:'Titre', req:1}, {n:'day', l:'Jour (vide = idée sans date)', t:'date'}, {n:'time', l:'Heure', t:'time'},
     {n:'place', l:'Lieu (lien Google Maps automatique)'},
     {n:'booking', l:'Réservation', t:'select', o:[['none', 'Pas besoin'], ['todo', 'À réserver'], ['done', 'Réservé']]},
     {n:'url', l:'Lien', t:'url'}, {n:'notes', l:'Notes', t:'textarea'}, {n:'priv', l:'Infos privées (réf., codes…)', t:'textarea'}]
 };
-const NOUN = {flights:'vol', stays:'logement', acts:'activité'};
+const NOUN = {flights:'vol', stays:'logement', cars:'location de voiture', acts:'activité'};
 function fieldHtml(f, v, d) {
   const id = 'f-' + f.n, val = v == null ? '' : v;
   if (f.t === 'select') return `<label class="fld"><span>${f.l}</span><select id="${id}" name="${f.n}">${f.o.map(([k, l]) => `<option value="${k}" ${val === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`;
-  if (f.t === 'pax') return `<fieldset><legend>${f.l}</legend><div class="checks">${d.people.map(p => `<label><input type="checkbox" name="pax" value="${esc(p.id)}" ${(val || []).includes(p.id) ? 'checked' : ''}>${esc(p.name)}</label>`).join('')}</div></fieldset>`;
+  if (f.t === 'pax') return `<fieldset><legend>${f.l}</legend><div class="checks">${d.people.map(p => `<label><input type="checkbox" name="${f.n}" value="${esc(p.id)}" ${(val || []).includes(p.id) ? 'checked' : ''}>${esc(p.name)}</label>`).join('')}</div></fieldset>`;
   if (f.t === 'textarea') return `<label class="fld"><span>${f.l}</span><textarea id="${id}" name="${f.n}">${esc(val)}</textarea></label>`;
   const type = f.t || 'text', extra = type === 'number' ? ' step="0.01" min="0" inputmode="decimal"' : '';
   return `<label class="fld"><span>${f.l}</span><input type="${type}" id="${id}" name="${f.n}" value="${esc(val)}"${extra}${f.req ? ' required' : ''}></label>`;
@@ -966,7 +1002,7 @@ function openForm(coll, id, defaults) {
   const d = view(), cur = id ? d[coll].find(x => x.id === id) : null;
   const vals = cur || Object.assign({}, defaults);
   formCtx = {coll, id: id || uid(), isNew: !cur};
-  showDlg(`<div class="sheet"><div class="sheet-art" aria-hidden="true"><svg><use href="#ridges"/></svg></div><h2>${cur ? 'Modifier' : 'Ajouter'} ${coll === 'acts' ? (cur ? 'l’' : 'une ') : (cur ? 'le ' : 'un ')}${NOUN[coll]}</h2>
+  showDlg(`<div class="sheet"><div class="sheet-art" aria-hidden="true"><svg><use href="#ridges"/></svg></div><h2>${cur ? 'Modifier' : 'Ajouter'} ${coll === 'acts' ? (cur ? 'l’' : 'une ') : coll === 'cars' ? (cur ? 'la ' : 'une ') : (cur ? 'le ' : 'un ')}${NOUN[coll]}</h2>
     <form class="f" novalidate><div class="fbody">${FIELDS[coll].map(f => fieldHtml(f, vals[f.n], d)).join('')}
     <div class="err" role="alert"></div></div>
     <div class="form-actions">${cur ? '<button type="button" class="btn danger small" data-act="delitem">Supprimer</button>' : ''}<span class="sp"></span>
@@ -974,7 +1010,7 @@ function openForm(coll, id, defaults) {
 }
 function describe(coll, x, verb) {
   const nm = coll === 'flights' ? `le vol ${x.kind === 'autre' ? '' : x.kind + ' '}${[x.number || x.airline].filter(Boolean).join('')}`.replace(/\s+/g, ' ').trim()
-    : coll === 'stays' ? `le logement ${x.name || ''}`.trim() : `l’activité ${x.title || ''}`.trim();
+    : coll === 'stays' ? `le logement ${x.name || ''}`.trim() : coll === 'cars' ? `la location de voiture ${x.company || ''}`.trim() : `l’activité ${x.title || ''}`.trim();
   return `${verb} ${nm}`;
 }
 dlg.addEventListener('submit', e => {
@@ -982,7 +1018,7 @@ dlg.addEventListener('submit', e => {
   e.preventDefault();
   const {coll, id, isNew} = formCtx, fd = new FormData(e.target), v = {};
   for (const f of FIELDS[coll]) {
-    if (f.t === 'pax') v.pax = fd.getAll('pax');
+    if (f.t === 'pax') v[f.n] = fd.getAll(f.n);
     else if (f.t === 'number') { const n = parseFloat(String(fd.get(f.n) || '').replace(',', '.')); v[f.n] = isFinite(n) && n >= 0 ? n : ''; }
     else if (f.t === 'url') v[f.n] = safeUrl(fd.get(f.n));
     else v[f.n] = String(fd.get(f.n) || '').trim();
@@ -991,6 +1027,7 @@ dlg.addEventListener('submit', e => {
   if (coll === 'stays' && !v.name) { err.textContent = 'Donne un nom au logement.'; return; }
   if (coll === 'acts' && !v.title) { err.textContent = 'Donne un titre à l’activité.'; return; }
   if (coll === 'stays' && v.arrive && v.depart && v.depart < v.arrive) { err.textContent = 'Le départ est avant l’arrivée.'; return; }
+  if (coll === 'cars' && v.pickupAt && v.returnAt && v.returnAt < v.pickupAt) { err.textContent = 'La restitution est avant la prise en charge.'; return; }
   if (coll === 'flights' && v.dep && v.arr && v.arr.slice(0, 10) < v.dep.slice(0, 10)) { err.textContent = 'L’arrivée est avant le départ.'; return; }
   mutate(describe(coll, v, isNew ? 'ajoute' : 'modifie'), d => {
     const i = d[coll].findIndex(x => x.id === id);
@@ -1052,6 +1089,7 @@ document.addEventListener('click', e => {
       const t = d.trip, k = b.dataset.kind, c = b.dataset.coll;
       if (c === 'flights') openForm(c, null, {kind:k, from:k === 'retour' ? t.to : t.from, to:k === 'retour' ? t.from : t.to, dep:(k === 'retour' ? t.end : t.start) + 'T10:00', arr:'', pax:d.people.map(p => p.id), url:'', notes:'', priv:''});
       else if (c === 'stays') openForm(c, null, {arrive:t.start + 'T15:00', depart:t.end + 'T10:00'});
+      else if (c === 'cars') openForm(c, null, {pickup:t.to, pickupAt:t.start + 'T10:00', returnPlace:'', returnAt:t.end + 'T08:00', drivers:[]});
       else openForm(c, null, {day:b.dataset.day || '', booking:'none'});
       break;
     }
@@ -1083,6 +1121,7 @@ document.addEventListener('click', e => {
       mutate(`retire ${nm}`, dd => {
         dd.people = dd.people.filter(p => p.id !== id);
         dd.flights.forEach(f => { f.pax = (f.pax || []).filter(i => i !== id); });
+        dd.cars.forEach(c => { c.drivers = (c.drivers || []).filter(i => i !== id); });
       });
       break;
     }
